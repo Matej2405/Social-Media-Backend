@@ -22,3 +22,4 @@
 packages/*
 
 # End of Visual Studio template
+.fake
