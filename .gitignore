@@ -8,6 +8,10 @@
 *.userosscache
 *.sln.docstates
 
+#Specific files
+Dockerfile
+Social-Media-Backend.sln
+homepage.png
 # User-specific folders
 .vs/
 
