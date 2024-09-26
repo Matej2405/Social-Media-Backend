@@ -48,5 +48,38 @@ namespace facebook_clone.Controllers
         return CreatedAtAction(nameof(GetById), new {id = userProfile.Id}, userProfile.ToUserProfileDto());
 
     }
+    [HttpPut("{id}")]
+    public IActionResult Update([FromRoute] int id, [FromBody] UpdateUserProfileRequestDto updateUserProfileDto){
+        var userProfile = _context.UserProfiles.FirstOrDefault(u => u.Id == id);
+
+        if(userProfile == null){
+            return NotFound();
+        }
+
+        userProfile.Name = updateUserProfileDto.Name;
+        userProfile.ProfilePicture = updateUserProfileDto.ProfilePicture;
+        userProfile.CoverPicture = updateUserProfileDto.CoverPicture;
+        userProfile.City = updateUserProfileDto.City;
+        userProfile.Country = updateUserProfileDto.Country;
+        userProfile.Bio = updateUserProfileDto.Bio;
+
+        _context.SaveChanges();
+
+        return NoContent();
+
+    }
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id){
+        var userProfile = _context.UserProfiles.FirstOrDefault(u => u.Id == id);
+
+        if(userProfile == null){
+            return NotFound();
+        }
+
+        _context.UserProfiles.Remove(userProfile);
+        _context.SaveChanges();
+
+        return NoContent();
+    }
     }
 }
