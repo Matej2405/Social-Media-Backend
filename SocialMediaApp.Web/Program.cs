@@ -2,16 +2,20 @@ using Microsoft.EntityFrameworkCore;
 using SocialMediaApp.Infrastructure.Data;
 using SocialMediaApp.Application.Interfaces;
 using SocialMediaApp.Infrastructure.Repositories;
+using SocialMediaApp.Application.Services;
+using SocialMediaApp.Application;
+using SocialMediaApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 var app = builder.Build();
 

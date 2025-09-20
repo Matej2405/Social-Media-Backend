@@ -2,12 +2,11 @@
 
 namespace SocialMediaApp.Application.Interfaces
 {
-   public interface IUserRepository
+    public interface IUserRepository
     {
-        Task<User> GetByIdAsync(int id);
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<User> GetByIdAsync(Guid? id);
         Task<User> AddAsync(User user);
         Task UpdateAsync(User user);
-        Task DeleteAsync(int id);
+        Task DeleteAsync(Guid id);
     }
 }
