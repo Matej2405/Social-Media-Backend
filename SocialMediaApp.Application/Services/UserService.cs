@@ -12,8 +12,8 @@ public class UserService : IUserService
     }
     public async Task<User?> GetUserByIdAsync(Guid id)
     {
-        var users = await _userRepository.GetAsync(id);
-        return users.FirstOrDefault();
+        var user = await _userRepository.GetByIdAsync(id);
+        return user;
     }
     public async Task<IEnumerable<User>> GetAllUsersAsync()
     {
