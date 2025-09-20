@@ -14,7 +14,11 @@ namespace SocialMediaApp.Infrastructure.Repositories
             _context = context;
         }
 
+<<<<<<< HEAD
         public async Task<User?> GetByIdAsync(Guid? id)
+=======
+        public async Task<User?> GetByIdAsync(int id)
+>>>>>>> 18e5e3d1172fe2cf736fb76f6174ebfca1eb95c8
         {
             return await _context.Users.FindAsync(id);
         }
