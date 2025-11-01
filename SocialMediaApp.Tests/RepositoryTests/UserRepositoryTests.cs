@@ -3,102 +3,145 @@ using SocialMediaApp.Infrastructure.Repositories;
 using SocialMediaApp.Infrastructure.Data;
 using SocialMediaApp.Domain.Entities;
 
-public class UserRepositoryTests
+public class UserRepositoryTests : IAsyncLifetime
 {
-    private ApplicationDbContext CreateDbContext()
+    private ApplicationDbContext _context = null!;
+    private UserRepository _repository = null!;
+
+    // DB initializer (runs before each test)
+    public async Task InitializeAsync()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        return new ApplicationDbContext(options);
+
+        _context = new ApplicationDbContext(options);
+        _repository = new UserRepository(_context);
+        await Task.CompletedTask;
+    }
+
+    // DB cleanup (runs after each test)
+    public async Task DisposeAsync()
+    {
+        // runs AFTER each test
+        await _context.Database.EnsureDeletedAsync();
+        await _context.DisposeAsync();
     }
 
     [Fact]
     public async Task AddAsync_AddsUserToDatabase()
     {
-        using var context = CreateDbContext();
-        var repo = new UserRepository(context);
+        #region Arrange
         var user = new User { Id = Guid.NewGuid(), Email = "test@example.com" };
+        #endregion
 
-        await repo.AddAsync(user);
+        #region Act
+        await _repository.AddAsync(user);
+        await _context.SaveChangesAsync();
+        #endregion
 
-        var dbUser = await context.Users.FindAsync(user.Id);
+        #region Assert
+        var dbUser = await _context.Users.FindAsync(user.Id);
         Assert.NotNull(dbUser);
         Assert.Equal(user.Email, dbUser.Email);
+        #endregion
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsUser_WhenExists()
     {
-        using var context = CreateDbContext();
+        #region Arrange
         var user = new User { Id = Guid.NewGuid(), Email = "test@example.com" };
-        context.Users.Add(user);
-        context.SaveChanges();
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        #endregion
 
-        var repo = new UserRepository(context);
-        var result = await repo.GetByIdAsync(user.Id);
+        #region Act
+        var result = await _repository.GetByIdAsync(user.Id);
+        #endregion
 
+        #region Assert
         Assert.NotNull(result);
         Assert.Equal(user.Email, result.Email);
+        #endregion
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsNull_WhenNotExists()
     {
-        using var context = CreateDbContext();
-        var repo = new UserRepository(context);
+        #region Act
+        var result = await _repository.GetByIdAsync(Guid.NewGuid());
+        #endregion
 
-        var result = await repo.GetByIdAsync(Guid.NewGuid());
-
+        #region Assert
         Assert.Null(result);
+        #endregion
     }
 
     [Fact]
     public async Task GetAllAsync_ReturnsAllUsers()
     {
-        using var context = CreateDbContext();
+        #region Arrange
         var users = new List<User>
         {
             new User { Id = Guid.NewGuid(), Email = "user1@example.com" },
             new User { Id = Guid.NewGuid(), Email = "user2@example.com" }
         };
-        context.Users.AddRange(users);
-        context.SaveChanges();
 
-        var repo = new UserRepository(context);
-        var result = await repo.GetAllAsync();
+        _context.Users.AddRange(users);
+        await _context.SaveChangesAsync();
+        #endregion
 
-        Assert.Equal(2, ((List<User>)result).Count);
+        #region Act
+        var result = await _repository.GetAllAsync();
+        #endregion
+
+        #region Assert
+        var list = result.ToList();
+        Assert.Equal(2, list.Count);
+        Assert.Contains(list, u => u.Email == "user1@example.com");
+        Assert.Contains(list, u => u.Email == "user2@example.com");
+        #endregion
     }
 
     [Fact]
     public async Task UpdateAsync_UpdatesUser()
     {
-        using var context = CreateDbContext();
+        #region Arrange
         var user = new User { Id = Guid.NewGuid(), Email = "old@example.com" };
-        context.Users.Add(user);
-        context.SaveChanges();
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
 
-        var repo = new UserRepository(context);
         user.Email = "new@example.com";
-        await repo.UpdateAsync(user);
+        #endregion
 
-        var updatedUser = await context.Users.FindAsync(user.Id);
+        #region Act
+        await _repository.UpdateAsync(user);
+        #endregion
+
+        #region Assert
+        var updatedUser = await _context.Users.FindAsync(user.Id);
+        Assert.NotNull(updatedUser);
         Assert.Equal("new@example.com", updatedUser.Email);
+        #endregion
     }
 
     [Fact]
     public async Task DeleteAsync_RemovesUser()
     {
-        using var context = CreateDbContext();
+        #region Arrange
         var user = new User { Id = Guid.NewGuid(), Email = "delete@example.com" };
-        context.Users.Add(user);
-        context.SaveChanges();
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        #endregion
 
-        var repo = new UserRepository(context);
-        await repo.DeleteAsync(user.Id);
+        #region Act
+        await _repository.DeleteAsync(user.Id);
+        #endregion
 
-        var deletedUser = await context.Users.FindAsync(user.Id);
+        #region Assert
+        var deletedUser = await _context.Users.FindAsync(user.Id);
         Assert.Null(deletedUser);
+        #endregion
     }
 }
