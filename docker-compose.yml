@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: socialmedia_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: socialmedia_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - sm_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: socialmedia_app
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: "Host=db;Port=5432;Database=socialmedia_app;Username=postgres;Password=postgres"
+    ports:
+      - "8080:8080"
+    networks:
+      - sm_network
+
+volumes:
+  pgdata:
+
+networks:
+  sm_network:
+    driver: bridge
