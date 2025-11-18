@@ -13,11 +13,17 @@ services:
       - sm_network
     secrets:
       - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     image: socialmediaapp:latest
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Postgres: "Host=db;Port=5432;Database=socialmedia_app;Username=postgres"
