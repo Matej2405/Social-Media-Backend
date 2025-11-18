@@ -2,11 +2,11 @@ services:
   db:
     image: postgres:17-alpine
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-      POSTGRES_DB: socialmedia_app
+      POSTGRES_DB: ${POSTGRES_DB:-socialmedia_app}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -25,11 +25,11 @@ services:
       db:
         condition: service_healthy
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__Postgres: "Host=db;Port=5432;Database=socialmedia_app;Username=postgres"
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__Postgres: "Host=db;Port=5432;Database=${POSTGRES_DB:-socialmedia_app};Username=${POSTGRES_USER:-postgres}"
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
     ports:
-      - "8081:8080"
+      - "${APP_PORT:-8081}:8080"
     networks:
       - sm_network
     secrets:

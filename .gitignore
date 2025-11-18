@@ -50,3 +50,6 @@ secrets/
 *.mdf
 *.ldf
 *.ndf
+
+# Environment files
+.env
