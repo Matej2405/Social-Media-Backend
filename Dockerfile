@@ -7,7 +7,6 @@ COPY SocialMediaApp.Application/SocialMediaApp.Application.csproj SocialMediaApp
 COPY SocialMediaApp.Domain/SocialMediaApp.Domain.csproj SocialMediaApp.Domain/
 COPY SocialMediaApp.Infrastructure/SocialMediaApp.Infrastructure.csproj SocialMediaApp.Infrastructure/
 COPY SocialMediaApp.Web/SocialMediaApp.Web.csproj SocialMediaApp.Web/
-COPY SocialMediaApp.Tests/SocialMediaApp.Tests.csproj SocialMediaApp.Tests/
 
 RUN dotnet restore
 
