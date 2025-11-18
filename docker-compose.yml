@@ -42,6 +42,9 @@ networks:
   sm_network:
     driver: bridge
 
+# Before running docker-compose, create the secrets file:
+#   mkdir -p secrets
+#   echo "your_secure_password" > secrets/db_password.txt
 secrets:
   db_password:
     file: ./secrets/db_password.txt
