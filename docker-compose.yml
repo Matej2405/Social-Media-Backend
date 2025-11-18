@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: socialmedia_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - sm_network
+    secrets:
+      - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: socialmediaapp:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: "Host=db;Port=5432;Database=socialmedia_app;Username=postgres"
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    ports:
+      - "8081:8080"
+    networks:
+      - sm_network
+    secrets:
+      - db_password
+
+volumes:
+  pgdata:
+
+networks:
+  sm_network:
+    driver: bridge
+
+# Before running docker-compose, create the secrets file:
+#   mkdir -p secrets
+#   echo "your_secure_password" > secrets/db_password.txt
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
