@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace SocialMediaApp.Web.Controllers
 {
@@ -11,7 +12,7 @@ namespace SocialMediaApp.Web.Controllers
             new
             {
                 status = "Healthy",
-                timestamp = System.DateTime.UtcNow
+                timestamp = DateTime.UtcNow
             });
     }
 }
