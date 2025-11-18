@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-
 namespace SocialMediaApp.Web.Controllers
 {
     [ApiController]
